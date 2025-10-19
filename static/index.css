@@ -1,0 +1,35 @@
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+}
+textarea {
+  display: block;
+  margin-left: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  resize: none;
+  width: 500px;
+  font-size: 13px;
+}
+#userInput {
+  min-height: 50px;
+  max-height: 100px;
+}
+#responseArea {
+  min-height: 500px;
+  max-height: 500px;
+}
+button {
+  display: block;
+  margin-left: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+input,
+label {
+  margin-left: 5px;
+  padding: 5px;
+  font-size: 14px;
+}

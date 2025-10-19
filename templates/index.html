@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="static/index.css" />
+  </head>
+  <body>
+    <p>
+      Step 1 (Optional): Generate problems. If you already have them, go to step
+      2.
+    </p>
+    <textarea
+      id="userInput"
+      placeholder="Give me 5 multiple choice problems and 5 fill in the blank problems on the topic of the quadratic formula"
+    ></textarea>
+    <button id="generateButton">Generate</button>
+    <p>
+      Step 2: Paste problems into the text area below. Edit as needed. Click
+      convert once done.
+    </p>
+    <label for="zipName">Name your zip file:</label>
+    <input type="text" id="zipName" placeholder="Quadratic Formula" />
+    <textarea id="responseArea" placeholder="Enter problems"></textarea>
+    <button id="convertButton">Convert</button>
+  </body>
+</html>
+
+<script>
+  const textareas = document.querySelectorAll("textarea");
+  const userInput = document.getElementById("userInput");
+  const generateButton = document.getElementById("generateButton");
+  const responseArea = document.getElementById("responseArea");
+
+  generateButton.addEventListener("click", generateProblems);
+
+  async function generateProblems() {
+    const message = userInput.value;
+    const response = await fetch("/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message }),
+    });
+
+    const data = await response.json();
+    responseArea.value = data.problems;
+    adjustTextareaHeight();
+  }
+
+  convertButton.addEventListener("click", convertProblems);
+
+  async function convertProblems() {
+    const zipName = document.getElementById("zipName").value;
+    const problems = responseArea.value;
+
+    const response = await fetch("/convert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ problems }),
+    });
+
+    const zip = await response.blob();
+    const url = URL.createObjectURL(zip);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = zipName + ".zip";
+    a.click();
+    a.remove(); // Removes the hidden "a" element from the html
+    URL.revokeObjectURL(url); // Frees up memory used by the blob URL
+  }
+
+  function adjustTextareaHeight() {
+    textareas.forEach((textarea) => {
+      textarea.addEventListener("input", () => {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight - 20 + "px";
+      });
+    });
+  }
+
+  adjustTextareaHeight();
+</script>
