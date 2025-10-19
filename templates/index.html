@@ -11,13 +11,18 @@
       Step 1 (Optional): Generate problems. If you already have them, go to step
       2.
     </p>
-    <textarea id="userInput"></textarea>
-    <button id="sendButton">Generate</button>
+    <textarea
+      id="userInput"
+      placeholder="Give me 5 multiple choice problems and 5 fill in the blank problems on the topic of the quadratic formula"
+    ></textarea>
+    <button id="generateButton">Generate</button>
     <p>
       Step 2: Paste problems into the text area below. Edit as needed. Click
       convert once done.
     </p>
-    <textarea id="responseArea"></textarea>
+    <label for="zipName">Name your zip file:</label>
+    <input type="text" id="zipName" placeholder="Quadratic Formula" />
+    <textarea id="responseArea" placeholder="Enter problems"></textarea>
     <button id="convertButton">Convert</button>
   </body>
 </html>
@@ -25,10 +30,10 @@
 <script>
   const textareas = document.querySelectorAll("textarea");
   const userInput = document.getElementById("userInput");
-  const sendButton = document.getElementById("sendButton");
+  const generateButton = document.getElementById("generateButton");
   const responseArea = document.getElementById("responseArea");
 
-  sendButton.addEventListener("click", generateProblems);
+  generateButton.addEventListener("click", generateProblems);
 
   async function generateProblems() {
     const message = userInput.value;
@@ -43,13 +48,46 @@
 
     const data = await response.json();
     console.log(data);
-    responseArea.innerHTML = data.problems;
+    responseArea.value = data.problems;
+    adjustTextareaHeight();
   }
 
-  textareas.forEach((textarea) => {
-    textarea.addEventListener("input", () => {
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight - 20 + "px";
+  convertButton.addEventListener("click", convertProblems);
+
+  async function convertProblems() {
+    const zipName = document.getElementById("zipName").value;
+    const problems = responseArea.value;
+    console.log(problems);
+
+    const response = await fetch("/convert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ problems }),
     });
-  });
+
+    const zip = await response.blob();
+    console.log(zip);
+    const url = URL.createObjectURL(zip);
+    console.log(url);
+    const a = document.createElement("a");
+    console.log(a);
+    a.href = url;
+    a.download = zipName + ".zip";
+    a.click();
+    a.remove(); // Removes the hidden "a" element from the html
+    URL.revokeObjectURL(url); // Frees up memory used by the blob URL
+  }
+
+  function adjustTextareaHeight() {
+    textareas.forEach((textarea) => {
+      textarea.addEventListener("input", () => {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight - 20 + "px";
+      });
+    });
+  }
+
+  adjustTextareaHeight();
 </script>

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
@@ -9,47 +9,16 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 import zipfile
 from xml.etree.ElementTree import Element, SubElement, ElementTree
+import subprocess
+from pathlib import Path
 
 class UserInput(BaseModel):
     message: str
 
-class GenerateProblems(BaseModel):
+class GeneratedProblems(BaseModel):
     problems: str
 
-PROMPT = "Generate problems given the user's topic. \
-        Format the problems as follows: \
-        Each question must start with the question number followed by a period and space and then the question text. Each question must be separated with a single blank line \
-        Examples: \
-        Multiple Choice: Each choice needs to start with a lower case alphabet, a, b, c, d, etc. with a close parenthesis. The correct choice is designated with an asterisk. \
-        1. What is 2+3? \
-        a) 6 \
-        b) 1 \
-        *c) 5 \
-        d) 10 \
-        Multiple-answers / multiple-select / select-all-that-apply: Each choice use [] to make the incorrect answers and [*] for the correct answers. \
-        1. Which of the following are dinosaurs? \
-        [ ] Woolly mammoth \
-        [*] Tyrannosaurus rex \
-        [*] Triceratops \
-        [ ] Smilodon fatalis \
-        Short-answer (fill-in-the-blank): The correct answers will use an asterisk followed by one or more spaces or tabs followed by an answer. \
-        1. Who lives at the North Pole? \
-        * Santa \
-        * Santa Claus \
-        * Father Christmas \
-        * Saint Nicholas \
-        * Saint Nick \
-        Free-response or Essay: This type of question is indicated by a sequence of three or four hashtags. \
-        1. Write an essay. \
-        #### \
-        File-upload: This type of question is indicated by a sequence of three or four carets. \
-        1. Upload a file. \
-        ^^^^ \
-        True/False: True and False statements start with a) and b). The correct choice is designated with an asterisk. \
-        1. Water is liquid. \
-        *a) True \
-        b) False \
-        Do not add any other text to your response. Only output the problems."
+PROMPT = Path("txt_format.txt").read_text()
 
 MODEL = "gpt-4o-mini"
 
@@ -64,7 +33,7 @@ templates = Jinja2Templates(directory="templates")
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.post("/generate", response_model=GenerateProblems)
+@app.post("/generate", response_model=GeneratedProblems)
 async def generate_problems(input: UserInput):
     response = client.chat.completions.create(
         model=MODEL,
@@ -83,14 +52,32 @@ async def generate_problems(input: UserInput):
     assert len(response.choices) == 1
     reply = response.choices[0].message.content
 
-    return GenerateProblems(problems=reply)
+    return GeneratedProblems(problems=reply)
 
 @app.post("/convert")
-async def convert_problems(input: UserInput):
-    data = await generate_problems(input)
-    problems = data.problems
+async def convert_problems(input: GeneratedProblems):
+    # format the problems or check if the problems are already formatted
 
+    input_file = 'placeholder.txt'
 
+    with open(input_file, 'w', encoding='utf-8') as f:
+        f.write(input.problems)
+        f.flush()
 
-    
-    
+    if not Path(input_file).exists():
+        return {"error": "File not found"}
+
+    try:
+        subprocess.run(["text2qti", input_file], check=True)
+    except subprocess.CalledProcessError as e:
+        return {"error": f"text2qti failed: {e}"}
+
+    zip_path = Path(input_file).with_suffix(".zip")
+    if not zip_path.exists():
+        return {"error": "Zip not found"}
+
+    return FileResponse(
+        path=zip_path,
+        filename=zip_path.name,
+        media_type="application/zip"
+    )

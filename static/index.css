@@ -9,13 +9,15 @@ textarea {
   padding: 10px;
   resize: none;
   width: 500px;
-  min-height: 30px;
+  font-size: 13px;
 }
 #userInput {
-  max-height: 200px;
+  min-height: 50px;
+  max-height: 100px;
 }
 #responseArea {
-  max-height: 600px;
+  min-height: 500px;
+  max-height: 500px;
 }
 button {
   display: block;
@@ -23,4 +25,11 @@ button {
   margin-top: 10px;
   font-size: 16px;
   cursor: pointer;
+}
+
+input,
+label {
+  margin-left: 5px;
+  padding: 5px;
+  font-size: 14px;
 }
