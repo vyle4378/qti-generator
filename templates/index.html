@@ -37,7 +37,6 @@
 
   async function generateProblems() {
     const message = userInput.value;
-    console.log(message);
     const response = await fetch("/generate", {
       method: "POST",
       headers: {
@@ -47,7 +46,6 @@
     });
 
     const data = await response.json();
-    console.log(data);
     responseArea.value = data.problems;
     adjustTextareaHeight();
   }
@@ -57,7 +55,6 @@
   async function convertProblems() {
     const zipName = document.getElementById("zipName").value;
     const problems = responseArea.value;
-    console.log(problems);
 
     const response = await fetch("/convert", {
       method: "POST",
@@ -68,11 +65,8 @@
     });
 
     const zip = await response.blob();
-    console.log(zip);
     const url = URL.createObjectURL(zip);
-    console.log(url);
     const a = document.createElement("a");
-    console.log(a);
     a.href = url;
     a.download = zipName + ".zip";
     a.click();
