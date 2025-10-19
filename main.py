@@ -12,6 +12,7 @@ from xml.etree.ElementTree import Element, SubElement, ElementTree
 import subprocess
 from pathlib import Path
 from fastapi import BackgroundTasks
+import tempfile
 
 class UserInput(BaseModel):
     message: str
@@ -76,8 +77,9 @@ async def convert_problems(input: GeneratedProblems, background_tasks: Backgroun
         input_file.unlink(missing_ok=True)
         return {"error": "Zip not found"}
 
-    background_tasks.add_task(input_file.unlink(missing_ok=True))
-    background_tasks.add_task(zip_path.unlink(missing_ok=True))
+    # Clean up the temporary files after the response is sent
+    background_tasks.add_task(input_file.unlink, missing_ok=True)
+    background_tasks.add_task(zip_path.unlink, missing_ok=True)
 
     return FileResponse(
         path=zip_path,
