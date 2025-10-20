@@ -16,8 +16,8 @@ textarea {
   max-height: 100px;
 }
 #responseArea {
-  min-height: 500px;
-  max-height: 500px;
+  min-height: 100px;
+  max-height: 300px;
 }
 button {
   display: block;

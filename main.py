@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -8,10 +8,8 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import zipfile
-from xml.etree.ElementTree import Element, SubElement, ElementTree
 import subprocess
 from pathlib import Path
-from fastapi import BackgroundTasks
 import tempfile
 
 class UserInput(BaseModel):
