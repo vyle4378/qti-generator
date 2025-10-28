@@ -10,6 +10,7 @@ body {
   margin-left: 30px;
   align-items: center;
   min-width: 300px;
+  font-size: 14px;
 }
 p,
 a {
@@ -40,6 +41,7 @@ a:hover {
 h1 {
   font-size: 25px;
   margin-bottom: 0;
+  color: rgb(56, 127, 109);
 }
 h3 {
   margin-bottom: 0;
@@ -83,7 +85,7 @@ p {
 }
 button {
   display: inline;
-  background-color: #dedede;
+  background-color: #87c9a1;
   border: none;
   border-radius: 5px;
   margin-top: 10px;
@@ -92,10 +94,10 @@ button {
   padding: 8px;
 }
 button:hover {
-  background-color: #c0bebe;
+  background-color: #75ae8c;
 }
 button:active {
-  background-color: #919191;
+  background-color: #639677;
 }
 input,
 label {
@@ -103,4 +105,7 @@ label {
   margin-left: 5px;
   padding: 5px;
   font-size: 14px;
+}
+div {
+  margin-top: 10px;
 }
