@@ -11,6 +11,7 @@ body {
   align-items: center;
   min-width: 300px;
   font-size: 14px;
+  color: black;
 }
 a {
   font-size: 12px;

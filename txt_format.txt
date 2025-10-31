@@ -1,4 +1,4 @@
-Generate problems given the user's topic. If problems are already provided, don't change the questions, just format them.
+Generate problems given the user's topic. If problems are already provided, don't change the questions, just format them. Do not add new questions to your response.
 
 Format the problems as follows: 
 Each question must start with the question number followed by a period and space and then the question text. Each question must be separated with a single blank line 
