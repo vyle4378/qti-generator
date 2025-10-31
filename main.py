@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
-from openai import OpenAI
+from anthropic import Anthropic
 import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -20,10 +20,10 @@ class GeneratedProblems(BaseModel):
 
 PROMPT = Path("txt_format.txt").read_text()
 
-MODEL = "gpt-4o-mini"
+MODEL = "claude-sonnet-4-5"
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 app = FastAPI()
 
 # Serve CSS, JS, images from the "static" folder
@@ -38,13 +38,11 @@ async def root(request: Request):
 
 @app.post("/generate", response_model=GeneratedProblems)
 async def generate_problems(input: UserInput):
-    response = client.chat.completions.create(
+    response = client.messages.create(
         model=MODEL,
+        system=PROMPT,
+        max_tokens=1000,
         messages=[
-            {
-                "role": "system",
-                "content": PROMPT,
-            },
             {
                 "role": "user",
                 "content": input.message
@@ -52,8 +50,8 @@ async def generate_problems(input: UserInput):
         ]
     )
 
-    assert len(response.choices) == 1
-    reply = response.choices[0].message.content
+    assert len(response.content) == 1
+    reply = response.content[0].text
 
     return GeneratedProblems(problems=reply)
 
