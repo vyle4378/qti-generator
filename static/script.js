@@ -39,9 +39,7 @@ async function convertProblems() {
     );
     return;
   } else {
-    console.log(zip);
     const url = URL.createObjectURL(zip);
-    console.log(url);
     const a = document.createElement("a");
     a.href = url;
     a.download = zipName + ".zip";
@@ -82,8 +80,6 @@ convertButton.addEventListener("click", () => {
   } else {
     alert("Please enter problems to convert");
   }
-
-  // If there's a formatting issue, alert the user.
 });
 
 adjustTextareaHeight();
