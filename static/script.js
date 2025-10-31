@@ -3,6 +3,7 @@ const userInput = document.getElementById("userInput");
 const generateButton = document.getElementById("generateButton");
 const responseArea = document.getElementById("responseArea");
 const convertButton = document.getElementById("convertButton");
+const formatButton = document.getElementById("formatButton");
 
 async function generateProblems(input) {
   const message = input.value;
@@ -20,11 +21,8 @@ async function generateProblems(input) {
 }
 
 async function convertProblems() {
-  const zipName = document.getElementById("zipName").value;
-
-  // Format the problems if they are not already formatted. Fix any wrong answers or typos.
-  generateProblems(responseArea);
   const problems = responseArea.value;
+  const zipName = document.getElementById("zipName").value;
 
   const response = await fetch("/convert", {
     method: "POST",
@@ -35,13 +33,22 @@ async function convertProblems() {
   });
 
   const zip = await response.blob();
-  const url = URL.createObjectURL(zip);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = zipName + ".zip";
-  a.click();
-  a.remove(); // Removes the hidden "a" element from the html
-  URL.revokeObjectURL(url); // Frees up memory used by the blob URL
+  if (zip.type !== "application/zip") {
+    alert(
+      "Error: There is a formatting issue. Please fix it and try again. You can click on the 'Format' button if needed."
+    );
+    return;
+  } else {
+    console.log(zip);
+    const url = URL.createObjectURL(zip);
+    console.log(url);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = zipName + ".zip";
+    a.click();
+    a.remove(); // Removes the hidden "a" element from the html
+    URL.revokeObjectURL(url); // Frees up memory used by the blob URL
+  }
 }
 
 function adjustTextareaHeight() {
@@ -61,12 +68,22 @@ generateButton.addEventListener("click", () => {
   }
 });
 
+formatButton.addEventListener("click", () => {
+  if (responseArea.value !== "") {
+    generateProblems(responseArea);
+  } else {
+    alert("Please enter problems to format");
+  }
+});
+
 convertButton.addEventListener("click", () => {
   if (responseArea.value !== "") {
     convertProblems();
   } else {
     alert("Please enter problems to convert");
   }
+
+  // If there's a formatting issue, alert the user.
 });
 
 adjustTextareaHeight();
