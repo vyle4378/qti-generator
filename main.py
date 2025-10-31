@@ -18,7 +18,8 @@ class UserInput(BaseModel):
 class GeneratedProblems(BaseModel):
     problems: str
 
-PROMPT = Path("txt_format.txt").read_text()
+GENERATE_PROMPT = Path("generate.txt").read_text()
+FORMAT_PROMPT = Path("format.txt").read_text()
 
 MODEL = "claude-sonnet-4-5"
 
@@ -40,12 +41,31 @@ async def root(request: Request):
 async def generate_problems(input: UserInput):
     response = client.messages.create(
         model=MODEL,
-        system=PROMPT,
+        system=GENERATE_PROMPT,
         max_tokens=1000,
         messages=[
             {
                 "role": "user",
                 "content": input.message
+            }
+        ]
+    )
+
+    assert len(response.content) == 1
+    reply = response.content[0].text
+
+    return GeneratedProblems(problems=reply)
+
+@app.post("/format", response_model=GeneratedProblems)
+async def format_problems(input: GeneratedProblems):
+    response = client.messages.create(
+        model=MODEL,
+        system=FORMAT_PROMPT,
+        max_tokens=1000,
+        messages=[
+            {
+                "role": "user",
+                "content": input.problems
             }
         ]
     )

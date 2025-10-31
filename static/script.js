@@ -5,8 +5,8 @@ const responseArea = document.getElementById("responseArea");
 const convertButton = document.getElementById("convertButton");
 const formatButton = document.getElementById("formatButton");
 
-async function generateProblems(input) {
-  const message = input.value;
+async function generateProblems(userInput) {
+  const message = userInput.value;
   const response = await fetch("/generate", {
     method: "POST",
     headers: {
@@ -17,6 +17,23 @@ async function generateProblems(input) {
 
   const data = await response.json();
   responseArea.value = data.problems;
+  console.log("done generating problems");
+  adjustTextareaHeight();
+}
+
+async function formatProblems(responseArea) {
+  const problems = responseArea.value;
+  const response = await fetch("/format", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ problems }),
+  });
+
+  const data = await response.json();
+  responseArea.value = data.problems;
+  console.log("done formatting problems");
   adjustTextareaHeight();
 }
 
@@ -46,6 +63,7 @@ async function convertProblems() {
     a.click();
     a.remove(); // Removes the hidden "a" element from the html
     URL.revokeObjectURL(url); // Frees up memory used by the blob URL
+    console.log("done converting problems");
   }
 }
 
@@ -68,7 +86,7 @@ generateButton.addEventListener("click", () => {
 
 formatButton.addEventListener("click", () => {
   if (responseArea.value !== "") {
-    generateProblems(responseArea);
+    formatProblems(responseArea);
   } else {
     alert("Please enter problems to format");
   }
