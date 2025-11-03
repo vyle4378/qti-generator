@@ -7,6 +7,7 @@ if the question is a file upload question, the answer is indicated by a sequence
 if the question is a free-response or essay question, the answer is indicated by a sequence of four underscores.
 
 Don't change the questions, just format them. Do not add new questions to your response.
+If there is a duplicate question, remove the duplicate.
 
 Examples: 
 Multiple Choice: Each choice needs to start with a lower case alphabet, a, b, c, d, etc. with a close parenthesis. The correct choice is designated with an asterisk. 
