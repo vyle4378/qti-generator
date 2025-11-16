@@ -49,22 +49,19 @@ async function convertProblems() {
     body: JSON.stringify({ problems }),
   });
 
-  const zip = await response.blob();
-  if (zip.type !== "application/zip") {
-    alert(
-      "Error: There is a formatting issue. Please fix it and try again. You can click on the 'Format' button if needed."
-    );
+  if (!response.ok) {
+    const error = await response.json();
+    alert(error.detail || "Conversion failed");
     return;
-  } else {
-    const url = URL.createObjectURL(zip);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = zipName + ".zip";
-    a.click();
-    a.remove(); // Removes the hidden "a" element from the html
-    URL.revokeObjectURL(url); // Frees up memory used by the blob URL
-    console.log("done converting problems");
   }
+  const zip = await response.blob();
+  const url = URL.createObjectURL(zip);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = zipName + ".zip";
+  a.click();
+  a.remove(); // Removes the hidden "a" element from the html
+  URL.revokeObjectURL(url); // Frees up memory used by the blob URL
 }
 
 function adjustTextareaHeight() {
